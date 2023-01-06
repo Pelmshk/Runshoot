@@ -4,8 +4,6 @@ import sys
 import pygame
 
 
-
-
 def load_image(name):
     fullname = os.path.join('data', name)
     if not os.path.isfile(fullname):
@@ -71,11 +69,11 @@ def generate_level(level):
             if level[y][x] == '.':
                 Tile('empty', x, y)
             elif level[y][x] == '/':
-                Wall('wall', x, y)
+                wall = Wall('wall', x, y)
+                walls_group.add(wall)
             Tile('empty', player_x, player_y)
-            new_player = Player(player_x, player_y)
     # вернем игрока, а также размер поля в клетках
-    return new_player, x, y
+    return x, y
 
 
 class Tile(pygame.sprite.Sprite):
@@ -94,8 +92,26 @@ class Wall(pygame.sprite.Sprite):
             tile_width * pos_x, tile_height * pos_y)
 
 
+class Bullet(pygame.sprite.Sprite):
+    def __init__(self, x, y, direction):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = bullet_image
+        self.rect = self.image.get_rect()
+        self.rect.bottom = y
+        self.rect.centerx = x
+        self.direction = direction
+        if direction in [UP, LEFT]:
+            self.speedy = -10
+        elif direction in [DOWN, RIGHT]:
+            self.speedy = 10
 
-
+    def update(self):
+        if self.direction in [UP, DOWN]:
+            self.rect.y += self.speedy
+        elif self.direction in [LEFT, RIGHT]:
+            self.rect.x += self.speedy
+        if self.rect.bottom < 0 or pygame.sprite.groupcollide(player_bullets_group, walls_group, True, False):
+            self.kill()
 
 
 class Player(pygame.sprite.Sprite):
@@ -131,6 +147,11 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect().move(
             player_x, player_y)
 
+    def shoot(self):
+        bullet = Bullet(self.rect.centerx, self.rect.top)
+        all_sprites.add(bullet)
+        player_bullets_group.add(bullet)
+
 
 def start_screen():
     global player, motion
@@ -143,15 +164,17 @@ def start_screen():
                 terminate()
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
-                    player, level_x, level_y = generate_level(level)
+                    level_x, level_y = generate_level(level)
+                    player = Player(player_x, player_y)
                     all_sprites.draw(screen)
                     all_sprites.update()
-                else:
+                elif event.key in [pygame.K_UP, pygame.K_DOWN, pygame.K_LEFT, pygame.K_RIGHT]:
                     Player.move(player, event)
+                elif event.key == 119:
+                    player.shoot()
 
-                player, level_x, level_y = generate_level(level)
-                all_sprites.draw(screen)
-                all_sprites.update()
+        all_sprites.draw(screen)
+        all_sprites.update()
 
         pygame.display.flip()
         clock.tick(FPS)
