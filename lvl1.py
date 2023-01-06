@@ -95,14 +95,30 @@ class Wall(pygame.sprite.Sprite):
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, x, y, direction):
         pygame.sprite.Sprite.__init__(self)
-        self.image = bullet_image
-        self.rect = self.image.get_rect()
-        self.rect.bottom = y
-        self.rect.centerx = x
         self.direction = direction
-        if direction in [UP, LEFT]:
+        if direction == UP:
+            self.image = bullet_image
+            self.rect = self.image.get_rect()
+            self.rect.bottom = y
+            self.rect.centerx = x
             self.speedy = -10
-        elif direction in [DOWN, RIGHT]:
+        elif direction == LEFT:
+            self.image = pygame.transform.rotate(bullet_image, 90)
+            self.rect = self.image.get_rect()
+            self.rect.bottom = y + 40
+            self.rect.centerx = x - 20
+            self.speedy = -10
+        elif direction == DOWN:
+            self.image = pygame.transform.rotate(bullet_image, 180)
+            self.rect = self.image.get_rect()
+            self.rect.bottom = y + 70
+            self.rect.centerx = x
+            self.speedy = 10
+        elif direction == RIGHT:
+            self.image = pygame.transform.rotate(bullet_image, 270)
+            self.rect = self.image.get_rect()
+            self.rect.bottom = y + 40
+            self.rect.centerx = x + 20
             self.speedy = 10
 
     def update(self):
