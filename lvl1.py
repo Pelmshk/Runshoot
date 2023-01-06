@@ -46,12 +46,14 @@ all_sprites = pygame.sprite.Group()
 tiles_group = pygame.sprite.Group()
 walls_group = pygame.sprite.Group()
 player_group = pygame.sprite.Group()
+player_bullets_group = pygame.sprite.Group()
 
 tile_images = {
     'wall': load_image('box.png'),
     'empty': load_image('grass.png')
 }
 player_image = load_image('mar.png')
+bullet_image = load_image('bullet.png')
 
 tile_width = tile_height = 50
 
@@ -90,6 +92,10 @@ class Wall(pygame.sprite.Sprite):
         self.image = tile_images[tile_type]
         self.rect = self.image.get_rect().move(
             tile_width * pos_x, tile_height * pos_y)
+
+
+
+
 
 
 class Player(pygame.sprite.Sprite):
