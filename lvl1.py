@@ -147,8 +147,8 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect().move(
             player_x, player_y)
 
-    def shoot(self):
-        bullet = Bullet(self.rect.centerx, self.rect.top)
+    def shoot(self, direction):
+        bullet = Bullet(self.rect.centerx, self.rect.top, direction)
         all_sprites.add(bullet)
         player_bullets_group.add(bullet)
 
@@ -171,7 +171,13 @@ def start_screen():
                 elif event.key in [pygame.K_UP, pygame.K_DOWN, pygame.K_LEFT, pygame.K_RIGHT]:
                     Player.move(player, event)
                 elif event.key == 119:
-                    player.shoot()
+                    player.shoot(UP)
+                elif event.key == 100:
+                    player.shoot(RIGHT)
+                elif event.key == 115:
+                    player.shoot(DOWN)
+                elif event.key == 97:
+                    player.shoot(LEFT)
 
         all_sprites.draw(screen)
         all_sprites.update()
