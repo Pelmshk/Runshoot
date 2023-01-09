@@ -30,14 +30,13 @@ FPS = 90
 # основной персонаж
 player = None
 player_x, player_y = 15, 505
+# загрузка уровня
 level = load_level('map1lvl.txt')
 
 RIGHT = 'to the right'
 LEFT = 'to the left'
 UP = 'to the top'
 DOWN = 'to the bottom'
-STOP = 'stop'
-motion = STOP
 
 # группы спрайтов
 all_sprites = pygame.sprite.Group()
@@ -61,6 +60,7 @@ def terminate():
     sys.exit()
 
 
+# создание уровня
 def generate_level(level):
     new_player, x, y = None, None, None
 
@@ -70,7 +70,6 @@ def generate_level(level):
                 Tile('empty', x, y)
             elif level[y][x] == '/':
                 wall = Wall('wall', x, y)
-                walls_group.add(wall)
             Tile('empty', player_x, player_y)
     # вернем игрока, а также размер поля в клетках
     return x, y
@@ -84,14 +83,17 @@ class Tile(pygame.sprite.Sprite):
             tile_width * pos_x, tile_height * pos_y)
 
 
+# класс препятсвий
 class Wall(pygame.sprite.Sprite):
     def __init__(self, tile_type, pos_x, pos_y):
         super().__init__(tiles_group, all_sprites)
         self.image = tile_images[tile_type]
         self.rect = self.image.get_rect().move(
             tile_width * pos_x, tile_height * pos_y)
+        walls_group.add(self)
 
 
+# класс пуль
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, x, y, direction):
         pygame.sprite.Sprite.__init__(self)
@@ -141,28 +143,25 @@ class Player(pygame.sprite.Sprite):
         global player_x, player_y
         pos_x, pos_y = player_x // 50, player_y // 50
         if event.key == pygame.K_UP:
-            if pos_y != 0:
-                if level[pos_y - 1][pos_x] != '/':
-                    player_y -= 50
+            if pos_y != 0 and level[pos_y - 1][pos_x] != '/':
+                player_y -= 50
 
         elif event.key == pygame.K_DOWN:
-            if pos_y != 10:
-                if level[pos_y + 1][pos_x] != '/':
-                    player_y += 50
+            if pos_y != 10 and level[pos_y + 1][pos_x] != '/':
+                player_y += 50
 
         elif event.key == pygame.K_LEFT:
-            if pos_x != 0:
-                if level[pos_y][pos_x - 1] != '/':
-                    player_x -= 50
+            if pos_x != 0 and level[pos_y][pos_x - 1] != '/':
+                player_x -= 50
 
         elif event.key == pygame.K_RIGHT:
-            if pos_x != 13:
-                if level[pos_y][pos_x + 1] != '/':
-                    player_x += 50
+            if pos_x != 13 and level[pos_y][pos_x + 1] != '/':
+                player_x += 50
 
         self.rect = self.image.get_rect().move(
             player_x, player_y)
 
+    # функция стрельбы, создающая объект класса Bullet
     def shoot(self, direction):
         bullet = Bullet(self.rect.centerx, self.rect.top, direction)
         all_sprites.add(bullet)
