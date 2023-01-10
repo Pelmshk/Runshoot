@@ -44,6 +44,7 @@ tiles_group = pygame.sprite.Group()
 walls_group = pygame.sprite.Group()
 player_group = pygame.sprite.Group()
 player_bullets_group = pygame.sprite.Group()
+coin_group = pygame.sprite.Group()
 
 tile_images = {
     'wall': load_image('box.png'),
@@ -51,8 +52,12 @@ tile_images = {
 }
 player_image = load_image('mar.png')
 bullet_image = load_image('bullet.png')
+coin_image = load_image('coin.png')
 
 tile_width = tile_height = 50
+
+# счетчик очков за уровень
+points_cnt = 0
 
 
 def terminate():
@@ -71,6 +76,11 @@ def generate_level(level):
             elif level[y][x] == '/':
                 wall = Wall('wall', x, y)
             Tile('empty', player_x, player_y)
+
+    coin1 = Coin(110, 60)
+    сoin2 = Coin(360, 360)
+    coin3 = Coin(13 * 50 + 10, 9 * 50 + 10)
+
     # вернем игрока, а также размер поля в клетках
     return x, y
 
@@ -129,6 +139,21 @@ class Bullet(pygame.sprite.Sprite):
         elif self.direction in [LEFT, RIGHT]:
             self.rect.x += self.speedy
         if self.rect.bottom < 0 or pygame.sprite.groupcollide(player_bullets_group, walls_group, True, False):
+            self.kill()
+
+
+# монетки
+class Coin(pygame.sprite.Sprite):
+    def __init__(self, pos_x, pos_y):
+        super().__init__(player_group, all_sprites)
+        self.image = coin_image
+        self.rect = self.image.get_rect().move(
+            pos_x, pos_y)
+
+    def update(self):
+        global points_cnt
+        if self.rect.colliderect(player.rect):
+            points_cnt += 1000
             self.kill()
 
 
