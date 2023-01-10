@@ -3,6 +3,8 @@ import sys
 
 import pygame
 
+pygame.font.init()
+
 
 def load_image(name):
     fullname = os.path.join('data', name)
@@ -27,11 +29,15 @@ def load_level(filename):
 
 
 FPS = 90
+# счетчик очков за уровень
+points_cnt = 0
+POINTS_COLOR = (216, 169, 3)
 # основной персонаж
 player = None
 player_x, player_y = 15, 505
 # загрузка уровня
 level = load_level('map1lvl.txt')
+points_font = pygame.font.Font(None, 40)
 
 RIGHT = 'to the right'
 LEFT = 'to the left'
@@ -55,9 +61,6 @@ bullet_image = load_image('bullet.png')
 coin_image = load_image('coin.png')
 
 tile_width = tile_height = 50
-
-# счетчик очков за уровень
-points_cnt = 0
 
 
 def terminate():
@@ -221,6 +224,10 @@ def start_screen():
 
         all_sprites.draw(screen)
         all_sprites.update()
+
+        points_text = points_font.render(f'points: {points_cnt}', True, POINTS_COLOR)
+        screen.blit(points_text, (10, 10))
+        pygame.display.update()
 
         pygame.display.flip()
         clock.tick(FPS)

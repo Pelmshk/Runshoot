@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="330f2a7a-79c6-4d92-998e-b693994385c9" name="Changes" comment="Добавлены комментарии">
+    <list default="true" id="330f2a7a-79c6-4d92-998e-b693994385c9" name="Changes" comment="3 монетки на уровне, при добавлении новых уровне переделать">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lvl1.py" beforeDir="false" afterPath="$PROJECT_DIR$/lvl1.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -82,7 +83,14 @@
       <option name="project" value="LOCAL" />
       <updated>1673271858366</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="3 монетки на уровне, при добавлении новых уровне переделать">
+      <created>1673376734017</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1673376734017</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -110,6 +118,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Добавлены комментарии" />
-    <option name="LAST_COMMIT_MESSAGE" value="Добавлены комментарии" />
+    <MESSAGE value="Рабочий класс монеток" />
+    <MESSAGE value="3 монетки на уровне, при добавлении новых уровне переделать" />
+    <option name="LAST_COMMIT_MESSAGE" value="3 монетки на уровне, при добавлении новых уровне переделать" />
   </component>
 </project>
