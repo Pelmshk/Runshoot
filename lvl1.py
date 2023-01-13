@@ -198,7 +198,7 @@ class Player(pygame.sprite.Sprite):
 
 def start_screen():
     global player, motion
-    fon = pygame.transform.scale(load_image('fon.jpg'), (width, height))
+    fon = pygame.transform.scale(load_image('fon.png'), (width, height))
     screen.blit(fon, (0, 0))
 
     while True:
