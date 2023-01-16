@@ -80,9 +80,9 @@ def generate_level(level):
                 wall = Wall('wall', x, y)
             Tile('empty', player_x, player_y)
 
-    coin1 = Coin(110, 60)
-    сoin2 = Coin(360, 360)
-    coin3 = Coin(13 * 50 + 10, 9 * 50 + 10)
+    coin1 = Coin(load_image('coin.png'), 6, 6, 110, 60)
+    сoin2 = Coin(load_image('coin.png'), 6, 6, 360, 360)
+    coin3 = Coin(load_image('coin.png'), 6, 6, 13 * 50 + 10, 9 * 50 + 10)
 
     # вернем игрока, а также размер поля в клетках
     return x, y
@@ -147,14 +147,27 @@ class Bullet(pygame.sprite.Sprite):
 
 # монетки
 class Coin(pygame.sprite.Sprite):
-    def __init__(self, pos_x, pos_y):
-        super().__init__(player_group, all_sprites)
-        self.image = coin_image
-        self.rect = self.image.get_rect().move(
-            pos_x, pos_y)
+    def __init__(self, sheet, columns, rows, x, y):
+        super().__init__(all_sprites)
+        self.frames = []
+        self.cut_sheet(sheet, columns, rows)
+        self.cur_frame = 0
+        self.image = self.frames[self.cur_frame]
+        self.rect = self.rect.move(x, y)
+
+    def cut_sheet(self, sheet, columns, rows):
+        self.rect = pygame.Rect(0, 0, sheet.get_width() // columns,
+                                sheet.get_height() // rows)
+        for j in range(rows):
+            for i in range(columns):
+                frame_location = (self.rect.w * i, self.rect.h * j)
+                self.frames.append(sheet.subsurface(pygame.Rect(
+                    frame_location, self.rect.size)))
 
     def update(self):
         global points_cnt
+        self.cur_frame = (self.cur_frame + 1) % len(self.frames)
+        self.image = self.frames[self.cur_frame]
         if self.rect.colliderect(player.rect):
             points_cnt += 1000
             self.kill()
