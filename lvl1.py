@@ -5,6 +5,8 @@ import pygame
 
 pygame.font.init()
 
+print(test)
+
 
 def load_image(name):
     fullname = os.path.join('data', name)
