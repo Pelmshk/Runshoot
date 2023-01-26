@@ -37,6 +37,7 @@ player = None
 player_x, player_y = 2, 503
 
 enemy_cnt = 3
+death = 0
 
 # загрузка уровня
 level = load_level('map1lvl.txt')
@@ -235,6 +236,10 @@ class EnemyHorizontal(pygame.sprite.Sprite):
         self.pos_x, self.pos_y, self.way = pos_x, pos_y, way
 
     def update(self):
+        global death
+        if pygame.sprite.groupcollide(player_group, enemy_group, True, False):
+            self.kill()
+            death = 1
         if self.goright:
             self.cnt += 1
             self.pos_x += 2
@@ -261,6 +266,10 @@ class EnemyVertical(pygame.sprite.Sprite):
         self.pos_x, self.pos_y, self.way = pos_x, pos_y, way
 
     def update(self):
+        global death
+        if pygame.sprite.groupcollide(player_group, enemy_group, True, False):
+            self.kill()
+            death = 1
         if self.goright:
             self.cnt += 1
             self.pos_y += 2
@@ -285,9 +294,9 @@ def start_screen():
     gogo = True
 
     while True:
+        if enemy_cnt == 0 or death == 1:
+            gogo = False
         for event in pygame.event.get():
-            if enemy_cnt == 0:
-                gogo = False
             if event.type == pygame.QUIT:
                 terminate()
             elif event.type == pygame.KEYDOWN:
@@ -319,11 +328,22 @@ def start_screen():
             clock.tick(FPS)
             pygame.event.pump()
         else:
-            fon = pygame.transform.scale(load_image('win.png'), (width, height))
-            screen.blit(fon, (0, 0))
-            points_text = points_font.render(f'Your score: {points_cnt}', True, POINTS_COLOR)
-            screen.blit(points_text, (260, 420))
+            if enemy_cnt == 0:
+                fon = pygame.transform.scale(load_image('win.png'), (width, height))
+                screen.blit(fon, (0, 0))
+                points_text = points_font.render(f'Your score: {points_cnt}', True, POINTS_COLOR)
+                screen.blit(points_text, (260, 420))
+            else:
+                fon = pygame.transform.scale(load_image('gameover.png'), (width, height))
+                screen.blit(fon, (0, 0))
+
             pygame.display.flip()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    terminate()
+                elif event.type == pygame.KEYDOWN:
+                    start_screen()
+
 
 
 if __name__ == '__main__':
