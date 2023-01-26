@@ -34,7 +34,10 @@ points_cnt = 0
 POINTS_COLOR = (216, 169, 3)
 # основной персонаж
 player = None
-player_x, player_y = 15, 505
+player_x, player_y = 2, 503
+
+enemy_cnt = 3
+
 # загрузка уровня
 level = load_level('map1lvl.txt')
 points_font = pygame.font.Font(None, 40)
@@ -49,6 +52,7 @@ all_sprites = pygame.sprite.Group()
 tiles_group = pygame.sprite.Group()
 walls_group = pygame.sprite.Group()
 player_group = pygame.sprite.Group()
+enemy_group = pygame.sprite.Group()
 player_bullets_group = pygame.sprite.Group()
 coin_group = pygame.sprite.Group()
 
@@ -57,6 +61,7 @@ tile_images = {
     'empty': load_image('grass.png')
 }
 player_image = load_image('mar.png')
+enemy_image = load_image('enemy.png')
 bullet_image = load_image('bullet.png')
 coin_image = load_image('coin.png')
 
@@ -83,6 +88,10 @@ def generate_level(level):
     coin1 = Coin(load_image('coin.png'), 6, 6, 110, 60)
     сoin2 = Coin(load_image('coin.png'), 6, 6, 360, 360)
     coin3 = Coin(load_image('coin.png'), 6, 6, 13 * 50 + 10, 9 * 50 + 10)
+
+    enemy1 = EnemyHorizontal(2, 52, 8)
+    enemy2 = EnemyVertical(2, 152, 3)
+    enemy3 = EnemyVertical(603, 203, 5)
 
     # вернем игрока, а также размер поля в клетках
     return x, y
@@ -137,12 +146,19 @@ class Bullet(pygame.sprite.Sprite):
             self.speedy = 10
 
     def update(self):
+        global enemy_cnt, points_cnt
         if self.direction in [UP, DOWN]:
             self.rect.y += self.speedy
         elif self.direction in [LEFT, RIGHT]:
             self.rect.x += self.speedy
+
         if self.rect.bottom < 0 or pygame.sprite.groupcollide(player_bullets_group, walls_group, True, False):
             self.kill()
+        elif pygame.sprite.groupcollide(player_bullets_group, enemy_group, True, True):
+            enemy_cnt -= 1
+            points_cnt += 500
+            self.kill()
+            print(enemy_cnt)
 
 
 # монетки
@@ -209,13 +225,69 @@ class Player(pygame.sprite.Sprite):
         player_bullets_group.add(bullet)
 
 
+class EnemyHorizontal(pygame.sprite.Sprite):
+    def __init__(self, pos_x, pos_y, way):
+        super().__init__(enemy_group, all_sprites)
+        self.image = enemy_image
+        self.rect = self.image.get_rect().move(
+            pos_x, pos_y)
+        self.cnt, self.goright = 0, True
+        self.pos_x, self.pos_y, self.way = pos_x, pos_y, way
+
+    def update(self):
+        if self.goright:
+            self.cnt += 1
+            self.pos_x += 2
+            self.rect = self.image.get_rect().move(
+                self.pos_x, self.pos_y)
+            if self.cnt >= self.way * 25:
+                self.goright = False
+        else:
+            self.cnt -= 1
+            self.pos_x -= 2
+            self.rect = self.image.get_rect().move(
+                self.pos_x, self.pos_y)
+            if self.cnt <= 0:
+                self.goright = True
+
+
+class EnemyVertical(pygame.sprite.Sprite):
+    def __init__(self, pos_x, pos_y, way):
+        super().__init__(enemy_group, all_sprites)
+        self.image = enemy_image
+        self.rect = self.image.get_rect().move(
+            pos_x, pos_y)
+        self.cnt, self.goright = 0, True
+        self.pos_x, self.pos_y, self.way = pos_x, pos_y, way
+
+    def update(self):
+        if self.goright:
+            self.cnt += 1
+            self.pos_y += 2
+            self.rect = self.image.get_rect().move(
+                self.pos_x, self.pos_y)
+            if self.cnt >= self.way * 25:
+                self.goright = False
+        else:
+            self.cnt -= 1
+            self.pos_y -= 2
+            self.rect = self.image.get_rect().move(
+                self.pos_x, self.pos_y)
+            if self.cnt <= 0:
+                self.goright = True
+
+
 def start_screen():
     global player, motion
     fon = pygame.transform.scale(load_image('fon.png'), (width, height))
     screen.blit(fon, (0, 0))
 
+    gogo = True
+
     while True:
         for event in pygame.event.get():
+            if enemy_cnt == 0:
+                gogo = False
             if event.type == pygame.QUIT:
                 terminate()
             elif event.type == pygame.KEYDOWN:
@@ -235,16 +307,23 @@ def start_screen():
                 elif event.key == 97:
                     player.shoot(LEFT)
 
-        all_sprites.draw(screen)
-        all_sprites.update()
+        if gogo:
+            all_sprites.draw(screen)
+            all_sprites.update()
 
-        points_text = points_font.render(f'points: {points_cnt}', True, POINTS_COLOR)
-        screen.blit(points_text, (10, 10))
-        pygame.display.update()
+            points_text = points_font.render(f'points: {points_cnt}', True, POINTS_COLOR)
+            screen.blit(points_text, (10, 10))
+            pygame.display.update()
 
-        pygame.display.flip()
-        clock.tick(FPS)
-        pygame.event.pump()
+            pygame.display.flip()
+            clock.tick(FPS)
+            pygame.event.pump()
+        else:
+            fon = pygame.transform.scale(load_image('win.png'), (width, height))
+            screen.blit(fon, (0, 0))
+            points_text = points_font.render(f'Your score: {points_cnt}', True, POINTS_COLOR)
+            screen.blit(points_text, (260, 420))
+            pygame.display.flip()
 
 
 if __name__ == '__main__':
