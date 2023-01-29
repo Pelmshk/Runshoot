@@ -2,6 +2,7 @@ import os
 import sys
 
 import pygame
+import random
 
 pygame.font.init()
 
@@ -40,7 +41,11 @@ enemy_cnt = 3
 death = 0
 
 # загрузка уровня
-level = load_level('map1lvl.txt')
+levelnum = random.randint(0, 1)
+if levelnum:
+    level = load_level('map1lvl.txt')
+else:
+    level = load_level('map2lvl.txt')
 points_font = pygame.font.Font(None, 40)
 
 RIGHT = 'to the right'
@@ -56,15 +61,17 @@ player_group = pygame.sprite.Group()
 enemy_group = pygame.sprite.Group()
 player_bullets_group = pygame.sprite.Group()
 coin_group = pygame.sprite.Group()
+info_group = pygame.sprite.Group()
 
 tile_images = {
-    'wall': load_image('box.png'),
-    'empty': load_image('grass.png')
+    'wall': load_image('wall.png'),
+    'empty': load_image('floor.png')
 }
 player_image = load_image('mar.png')
 enemy_image = load_image('enemy.png')
 bullet_image = load_image('bullet.png')
 coin_image = load_image('coin.png')
+info_image = load_image('info.png')
 
 tile_width = tile_height = 50
 
@@ -86,13 +93,23 @@ def generate_level(level):
                 wall = Wall('wall', x, y)
             Tile('empty', player_x, player_y)
 
-    coin1 = Coin(load_image('coin.png'), 6, 6, 110, 60)
-    сoin2 = Coin(load_image('coin.png'), 6, 6, 360, 360)
-    coin3 = Coin(load_image('coin.png'), 6, 6, 13 * 50 + 10, 9 * 50 + 10)
+    if levelnum:
+        coin1 = Coin(load_image('coin.png'), 6, 6, 110, 60)
+        сoin2 = Coin(load_image('coin.png'), 6, 6, 360, 360)
+        coin3 = Coin(load_image('coin.png'), 6, 6, 13 * 50 + 10, 9 * 50 + 10)
 
-    enemy1 = EnemyHorizontal(2, 52, 8)
-    enemy2 = EnemyVertical(2, 152, 3)
-    enemy3 = EnemyVertical(603, 203, 5)
+        enemy1 = EnemyHorizontal(2, 52, 8)
+        enemy2 = EnemyVertical(2, 152, 3)
+        enemy3 = EnemyVertical(603, 203, 5)
+
+    else:
+        coin1 = Coin(load_image('coin.png'), 6, 6, 7 * 50 + 10, 50 + 10)
+        сoin2 = Coin(load_image('coin.png'), 6, 6, 50 + 10, 5 * 50 + 10)
+        coin3 = Coin(load_image('coin.png'), 6, 6, 9 * 50 + 10, 6 * 50 + 10)
+
+        enemy1 = EnemyHorizontal(6 * 50 + 2, 52, 7)
+        enemy2 = EnemyVertical(2, 2, 5)
+        enemy3 = EnemyHorizontal(3 * 50 + 2, 8 * 50 + 2, 10)
 
     # вернем игрока, а также размер поля в клетках
     return x, y
@@ -286,12 +303,22 @@ class EnemyVertical(pygame.sprite.Sprite):
                 self.goright = True
 
 
+class Info(pygame.sprite.Sprite):
+    def __init__(self, pos_x, pos_y):
+        super().__init__(info_group, all_sprites)
+        self.image = info_image
+        self.rect = self.image.get_rect().move(
+            pos_x, pos_y)
+
+
 def start_screen():
     global player, motion
     fon = pygame.transform.scale(load_image('fon.png'), (width, height))
     screen.blit(fon, (0, 0))
 
     gogo = True
+    started = False
+    info_opened = False
 
     while True:
         if enemy_cnt == 0 or death == 1:
@@ -300,11 +327,20 @@ def start_screen():
             if event.type == pygame.QUIT:
                 terminate()
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
+                if event.key == pygame.K_SPACE and not started:
                     level_x, level_y = generate_level(level)
                     player = Player(player_x, player_y)
                     all_sprites.draw(screen)
                     all_sprites.update()
+                    started = True
+                elif event.key == pygame.K_F1:
+                    if not info_opened:
+                        info = Info(0, 0)
+                        info_group.draw(screen)
+                        info_opened = True
+                    else:
+                        info.kill()
+                        info_opened = False
                 elif event.key in [pygame.K_UP, pygame.K_DOWN, pygame.K_LEFT, pygame.K_RIGHT]:
                     Player.move(player, event)
                 elif event.key == 119:
@@ -342,7 +378,7 @@ def start_screen():
                 if event.type == pygame.QUIT:
                     terminate()
                 elif event.type == pygame.KEYDOWN:
-                    start_screen()
+                    terminate()
 
 
 
